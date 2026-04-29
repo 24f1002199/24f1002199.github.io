@@ -1,0 +1,25 @@
+name: Hash Chain Verification
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  hash-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compute hash marker 5574e3a8
+        env:
+          MY_SECRET: ${{ secrets.MY_SECRET }}
+        run: |
+          # Compute SHA-256 of secret + "github-verified"
+          # Then take the first 10 characters
+          echo -n "${MY_SECRET}github-verified" | sha256sum | cut -c1-10 > hash.txt
+          echo "Generated Hash: $(cat hash.txt)"
+
+      - name: Upload artifact verify-hash-5574e3a8
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-hash-5574e3a8
+          path: hash.txt
